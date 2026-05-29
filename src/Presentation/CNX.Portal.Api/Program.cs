@@ -1,6 +1,7 @@
 using CNX.Application;
 using CNX.Infrastructure;
 using CNX.Infrastructure.Data;
+using CNX.Infrastructure.Data.Master;
 using CNX.Infrastructure.MultiTenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Identity
+// Identity - dùng MasterDbContext cho auth (login qua master, rồi switch sang tenant DB)
 builder.Services.AddIdentity<ApplicationUser, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -21,7 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, Microsoft.AspNetCore.Identity.Iden
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<MasterDbContext>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -56,7 +57,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "CNX Portal API",
         Version = "v1",
-        Description = "Portal API cho khách hàng - truy cập qua subdomain riêng"
+        Description = "Portal API cho khách hàng - truy cập qua subdomain riêng (Database-per-Tenant)"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -102,7 +103,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowSubdomains");
 
-// Tenant Resolution Middleware - phân giải tenant từ subdomain
+// Tenant Resolution Middleware - phân giải tenant từ subdomain, lấy connection string từ MasterDB
 app.UseMiddleware<TenantResolutionMiddleware>();
 
 app.UseAuthentication();

@@ -1,6 +1,8 @@
 using CNX.Application;
 using CNX.Infrastructure;
+using CNX.Infrastructure.Audit;
 using CNX.Infrastructure.Data;
+using CNX.Infrastructure.Data.Master;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -12,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Identity
+// Identity - sử dụng MasterDbContext cho user management (login qua master DB)
 builder.Services.AddIdentity<ApplicationUser, Microsoft.AspNetCore.Identity.IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -20,7 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, Microsoft.AspNetCore.Identity.Iden
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<MasterDbContext>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -59,11 +61,11 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "CNX Admin API",
         Version = "v1",
-        Description = "Hệ thống quản trị tổng thể - CNX Counting"
+        Description = "Hệ thống quản trị tổng thể - CNX Counting (Database-per-Tenant)"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the ****** Example: ******",
+        Description = "JWT Authorization header. Example: ******",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,

@@ -1,4 +1,5 @@
 using CNX.Domain.Entities.Accounting;
+using CNX.Domain.Entities.Audit;
 using CNX.Domain.Entities.Inventory;
 using CNX.Domain.Entities.Production;
 using CNX.Domain.Entities.Tax;
@@ -9,19 +10,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CNX.Infrastructure.Data;
 
+/// <summary>
+/// Tenant Database Context - Mỗi tenant (khách hàng) có 1 database riêng.
+/// Context này được tạo bởi TenantDbContextFactory với connection string riêng cho từng tenant.
+/// Chứa toàn bộ data nghiệp vụ: Kế toán, Tồn kho, Sản xuất, Thuế, Audit log...
+/// </summary>
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
-    private readonly Guid? _tenantId;
-
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantAccessor? tenantAccessor = null)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
-        _tenantId = tenantAccessor?.TenantId;
     }
-
-    // Tenant
-    public DbSet<TenantInfo> Tenants { get; set; }
-    public DbSet<TenantUser> TenantUsers { get; set; }
 
     // Accounting
     public DbSet<AccountChart> AccountCharts { get; set; }
@@ -44,6 +43,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<BillOfMaterial> BillOfMaterials { get; set; }
     public DbSet<ProductionCost> ProductionCosts { get; set; }
 
+    // Audit
+    public DbSet<AuditLog> AuditLogs { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -51,18 +53,32 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Apply all configurations from assembly
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
-        // Global query filter for multi-tenancy
-        if (_tenantId.HasValue)
+        // Soft delete filter - không cần TenantId filter vì mỗi tenant đã có DB riêng
+        builder.Entity<AccountChart>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<JournalEntry>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Invoice>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<TaxReport>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Warehouse>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<InventoryItem>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<InventoryTransaction>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ProductionOrder>().HasQueryFilter(x => !x.IsDeleted);
+
+        // AuditLog configuration
+        builder.Entity<AuditLog>(entity =>
         {
-            builder.Entity<AccountChart>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<JournalEntry>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<Invoice>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<TaxReport>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<Warehouse>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<InventoryItem>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<InventoryTransaction>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-            builder.Entity<ProductionOrder>().HasQueryFilter(x => x.TenantId == _tenantId && !x.IsDeleted);
-        }
+            entity.ToTable("AuditLogs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.EntityName).HasMaxLength(200);
+            entity.Property(e => e.EntityId).HasMaxLength(200);
+            entity.Property(e => e.Action).HasMaxLength(50);
+            entity.Property(e => e.UserId).HasMaxLength(200);
+            entity.Property(e => e.UserName).HasMaxLength(200);
+            entity.Property(e => e.IpAddress).HasMaxLength(50);
+            entity.HasIndex(e => e.EntityName);
+            entity.HasIndex(e => e.Timestamp);
+            entity.HasIndex(e => e.UserId);
+        });
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -94,4 +110,5 @@ public class ApplicationUser : IdentityUser
 public interface ITenantAccessor
 {
     Guid? TenantId { get; }
+    string? TenantConnectionString { get; }
 }

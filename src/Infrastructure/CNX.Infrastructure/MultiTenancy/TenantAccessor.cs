@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Http;
 namespace CNX.Infrastructure.MultiTenancy;
 
 /// <summary>
-/// Xác định TenantId dựa trên subdomain từ HTTP request
+/// Xác định TenantId và ConnectionString dựa trên HTTP request.
+/// Sau khi TenantResolutionMiddleware phân giải tenant, accessor lấy thông tin từ HttpContext.
 /// </summary>
 public class TenantAccessor : ITenantAccessor
 {
@@ -21,6 +22,14 @@ public class TenantAccessor : ITenantAccessor
         {
             var tenantId = _httpContextAccessor.HttpContext?.Items["TenantId"] as Guid?;
             return tenantId;
+        }
+    }
+
+    public string? TenantConnectionString
+    {
+        get
+        {
+            return _httpContextAccessor.HttpContext?.Items["TenantConnectionString"] as string;
         }
     }
 }
