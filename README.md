@@ -1,5 +1,20 @@
 # CNX_Counting - Hệ thống Quản trị Kế toán Đa khách hàng
 
+## 🤖 Đặc tả cho AI / Copilot (đọc trước khi sinh code)
+
+Để AI **luôn bám theo chuẩn cốt lõi** (không mỗi lần một kiểu), dự án có 2 file chuẩn:
+
+- **`docs/cnx-agent-spec.json`** — đặc tả cốt lõi (single source of truth): kiến trúc, tech stack, bảng màu, module, chuẩn API.
+- **`.github/copilot-instructions.md`** — file mà GitHub Copilot & Visual Studio **tự động đọc** mỗi lần chạy, ép AI tuân theo đặc tả trên.
+
+**Cách dùng:**
+1. Trong Visual Studio 2022 / VS Code, mở Copilot Chat ở chế độ **Agent**.
+2. Copilot sẽ tự đọc `.github/copilot-instructions.md`. Bạn chỉ cần ra lệnh ngắn gọn, ví dụ:
+   > "Đọc `docs/cnx-agent-spec.json` và triển khai module Inventory đúng đặc tả, build và sửa lỗi đến khi pass."
+3. Khi AI đi lệch hướng, nhắc lại: *"Bám theo `docs/cnx-agent-spec.json`."* — toàn bộ căn bản cốt lõi đã được giữ trong file đó.
+
+> 💡 Muốn đổi yêu cầu cốt lõi (màu sắc, module, kiến trúc...)? Hãy sửa trong `docs/cnx-agent-spec.json` — đừng chỉ nói trong chat, để lần sau AI vẫn nhớ.
+
 ## Thông tin siêu dự án
 
 Hệ thống quản trị số liệu kế toán cho công ty dịch vụ kế toán, phục vụ nhiều khách hàng với các phân hệ:
