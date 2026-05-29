@@ -45,6 +45,10 @@ public class TenantService : ITenantService
 
     public async Task<ApiResponse<TenantDto>> CreateTenantAsync(CreateTenantDto dto)
     {
+        // Validate subdomain format
+        if (!IsValidSubdomain(dto.Subdomain))
+            return ApiResponse<TenantDto>.FailResponse("Subdomain không hợp lệ (chỉ chấp nhận chữ thường, số và dấu gạch ngang)");
+
         // Check duplicate subdomain
         var existing = await _tenantRepository.GetBySubdomainAsync(dto.Subdomain);
         if (existing != null)
@@ -153,5 +157,14 @@ public class TenantService : ITenantService
             ContractEndDate = tenant.ContractEndDate,
             LogoUrl = tenant.LogoUrl
         };
+    }
+
+    private static bool IsValidSubdomain(string subdomain)
+    {
+        if (string.IsNullOrWhiteSpace(subdomain) || subdomain.Length > 63)
+            return false;
+
+        // Only lowercase alphanumeric and hyphens, cannot start/end with hyphen
+        return System.Text.RegularExpressions.Regex.IsMatch(subdomain, @"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$");
     }
 }

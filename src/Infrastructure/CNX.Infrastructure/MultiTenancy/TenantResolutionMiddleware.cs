@@ -40,7 +40,7 @@ public class TenantResolutionMiddleware
             else
             {
                 context.Response.StatusCode = 404;
-                await context.Response.WriteAsync("Tenant not found or inactive.");
+                await context.Response.WriteAsync("Resource not found.");
                 return;
             }
         }

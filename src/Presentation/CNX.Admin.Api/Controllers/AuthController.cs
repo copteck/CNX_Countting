@@ -88,7 +88,8 @@ public class AuthController : ControllerBase
             claims.Add(new Claim("TenantId", user.TenantId.Value.ToString()));
 
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"] ?? "CNX_SuperSecretKey_ChangeInProduction_2024!"));
+            Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]
+                ?? throw new InvalidOperationException("JWT SecretKey is not configured")));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expiration = DateTime.UtcNow.AddMinutes(
             int.Parse(_configuration["Jwt:ExpirationInMinutes"] ?? "60"));
