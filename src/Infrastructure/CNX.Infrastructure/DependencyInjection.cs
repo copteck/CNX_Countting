@@ -93,7 +93,7 @@ public static class DependencyInjection
         // Background job channel + service
         services.AddSingleton(Channel.CreateUnbounded<Guid>(new UnboundedChannelOptions
         {
-            SingleReader = false,
+            SingleReader = true,
             SingleWriter = false
         }));
         services.AddScoped<IApiSyncJobService, ApiSyncJobService>();

@@ -58,7 +58,7 @@ public class ApiSyncBackgroundService : BackgroundService
         var job = await masterDb.ApiSyncJobs.FindAsync(new object[] { jobId }, cancellationToken);
         if (job == null || job.Status == ApiSyncJobStatus.Cancelled) return;
 
-        _logger.LogInformation("Starting sync job: {JobName} ({JobId})", job.JobName, jobId);
+        _logger.LogInformation("Starting sync job: {JobId}", jobId);
 
         // Update status to Running
         job.Status = ApiSyncJobStatus.Running;
@@ -105,8 +105,8 @@ public class ApiSyncBackgroundService : BackgroundService
             job.CompletedAt = DateTime.UtcNow;
             await masterDb.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Sync job completed: {JobName} ({JobId}). Processed: {Processed}, Failed: {Failed}",
-                job.JobName, jobId, job.ProcessedRecords, job.FailedRecords);
+            _logger.LogInformation("Sync job completed: {JobId}. Processed: {Processed}, Failed: {Failed}",
+                jobId, job.ProcessedRecords, job.FailedRecords);
         }
         catch (Exception ex)
         {
@@ -179,7 +179,7 @@ public class ApiSyncJobService : IApiSyncJobService
         // Enqueue to background processing channel
         await _jobChannel.Writer.WriteAsync(job.Id, cancellationToken);
 
-        _logger.LogInformation("Enqueued sync job: {JobName} ({JobId})", job.JobName, job.Id);
+        _logger.LogInformation("Enqueued sync job: {JobId}", job.Id);
         return job.Id;
     }
 

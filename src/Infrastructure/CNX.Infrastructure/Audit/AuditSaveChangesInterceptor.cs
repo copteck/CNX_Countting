@@ -47,9 +47,8 @@ public class AuditSaveChangesInterceptor : SaveChangesInterceptor
     {
         if (eventData.Context is null) return await base.SavedChangesAsync(eventData, result, cancellationToken);
 
-        if (_pendingAuditEntries.TryGetValue(eventData.Context.ContextId.InstanceId, out var auditEntries))
+        if (_pendingAuditEntries.TryRemove(eventData.Context.ContextId.InstanceId, out var auditEntries))
         {
-            _pendingAuditEntries.Remove(eventData.Context.ContextId.InstanceId);
             await SaveAuditLogsAsync(eventData.Context, auditEntries, cancellationToken);
         }
 
@@ -57,7 +56,7 @@ public class AuditSaveChangesInterceptor : SaveChangesInterceptor
     }
 
     // Thread-safe storage for pending entries
-    private static readonly Dictionary<Guid, List<AuditEntry>> _pendingAuditEntries = new();
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, List<AuditEntry>> _pendingAuditEntries = new();
 
     private List<AuditEntry> OnBeforeSaveChanges(DbContext context)
     {
