@@ -1,0 +1,11 @@
+@inject NavigationManager Navigation
+
+@code {
+    /// <summary>?i?u h??ng ng??i dùng ch?a ??ng nh?p v? trang ??ng nh?p.</summary>
+    protected override void OnInitialized()
+    {
+        var returnUrl = Uri.EscapeDataString(
+            Navigation.ToBaseRelativePath(Navigation.Uri));
+        Navigation.NavigateTo($"login?returnUrl={returnUrl}", forceLoad: false);
+    }
+}

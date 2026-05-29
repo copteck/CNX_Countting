@@ -1,0 +1,44 @@
+@inject MenuService Menu
+
+<div class="cnx-brand">
+    <div class="cnx-brand-logo">CNX</div>
+    @if (!Collapsed)
+    {
+        <div class="cnx-brand-text">
+            <span class="cnx-brand-name">Super Tool</span>
+            <span class="cnx-brand-tag">Admin Console</span>
+        </div>
+    }
+</div>
+
+<nav class="cnx-nav">
+    @foreach (var group in Menu.Groups)
+    {
+        @if (!Collapsed)
+        {
+            <div class="cnx-nav-group">@group.Title</div>
+        }
+        else
+        {
+            <div class="cnx-nav-group-divider"></div>
+        }
+
+        @foreach (var item in group.Items)
+        {
+            <NavLink class="cnx-nav-link" href="@item.Path"
+                     Match="@(item.Path == "/" ? NavLinkMatch.All : NavLinkMatch.Prefix)">
+                <span class="material-icons cnx-nav-icon" title="@item.Text">@item.Icon</span>
+                @if (!Collapsed)
+                {
+                    <span class="cnx-nav-text">@item.Text</span>
+                }
+            </NavLink>
+        }
+    }
+</nav>
+
+@code {
+    /// <summary>Tr?ng thái thu g?n sidebar.</summary>
+    [Parameter]
+    public bool Collapsed { get; set; }
+}

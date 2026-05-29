@@ -1,0 +1,54 @@
+@implements IDisposable
+@inject TabService Tabs
+@inject NavigationManager Navigation
+
+@if (Tabs.Tabs.Count > 0)
+{
+    <div class="cnx-tabbar">
+        <div class="cnx-tabbar-list">
+            @foreach (var tab in Tabs.Tabs)
+            {
+                <div class="cnx-tab @(tab.Path == Tabs.ActivePath ? "active" : string.Empty)"
+                     @onclick="@(() => Activate(tab.Path))">
+                    <span class="material-icons cnx-tab-icon">@tab.Icon</span>
+                    <span class="cnx-tab-text">@tab.Title</span>
+                    <span class="material-icons cnx-tab-close"
+                          @onclick:stopPropagation="true"
+                          @onclick="@(() => Close(tab.Path))">close</span>
+                </div>
+            }
+        </div>
+        <button class="cnx-tab-closeall" title="?óng t?t c?" @onclick="CloseAll">
+            <span class="material-icons">clear_all</span>
+        </button>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized() => Tabs.OnChange += StateHasChanged;
+
+    private void Activate(string path)
+    {
+        if (path != Tabs.ActivePath)
+        {
+            Navigation.NavigateTo(path);
+        }
+    }
+
+    private void Close(string path)
+    {
+        var navigateTo = Tabs.Close(path);
+        if (navigateTo is not null)
+        {
+            Navigation.NavigateTo(navigateTo);
+        }
+    }
+
+    private void CloseAll()
+    {
+        Tabs.CloseAll();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose() => Tabs.OnChange -= StateHasChanged;
+}

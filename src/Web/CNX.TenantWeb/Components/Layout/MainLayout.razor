@@ -1,0 +1,88 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject CNX.TenantWeb.Services.MenuService Menu
+@inject CNX.TenantWeb.Services.TabService Tabs
+@inject NavigationManager Navigation
+
+<div style="display:flex; min-height:100vh;">
+    @* ── SIDEBAR ── *@
+    <aside class="cnx-sidebar">
+        <div class="cnx-sidebar-logo">CNX</div>
+        <nav style="padding:8px 0;">
+            <div class="cnx-menu-group">TỔNG QUAN</div>
+            <NavLink class="cnx-menu-item" href="/" Match="NavLinkMatch.All">
+                <RadzenIcon Icon="dashboard" /> Dashboard
+            </NavLink>
+
+            <div class="cnx-menu-group">SỐ LIỆU</div>
+            <NavLink class="cnx-menu-item" href="/accounting">
+                <RadzenIcon Icon="account_balance" /> Kế toán
+            </NavLink>
+            <NavLink class="cnx-menu-item" href="/inventory">
+                <RadzenIcon Icon="inventory_2" /> Tồn kho
+            </NavLink>
+            <NavLink class="cnx-menu-item" href="/production">
+                <RadzenIcon Icon="precision_manufacturing" /> Sản xuất
+            </NavLink>
+            <NavLink class="cnx-menu-item" href="/tax">
+                <RadzenIcon Icon="receipt_long" /> Thuế
+            </NavLink>
+        </nav>
+    </aside>
+
+    @* ── MAIN AREA ── *@
+    <div class="cnx-content" style="flex:1;">
+        <header class="cnx-header">
+            <span style="font-size:14px; color:var(--cnx-text-secondary);">Cổng khách hàng</span>
+            <span style="font-size:14px; color:var(--cnx-text-secondary);">👤 Tenant</span>
+        </header>
+
+        <TabBar />
+
+        <div style="padding:24px;">
+            <CnxErrorBoundary @ref="_errorBoundary">
+                @Body
+            </CnxErrorBoundary>
+        </div>
+    </div>
+</div>
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<div id="blazor-error-ui" style="display:none;">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    private CnxErrorBoundary? _errorBoundary;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        SyncTab();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _errorBoundary?.RecoverFromError();
+        SyncTab();
+    }
+
+    /// <summary>Mở/kích hoạt tab tương ứng với menu đang điều hướng tới.</summary>
+    private void SyncTab()
+    {
+        var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).TrimEnd('/');
+        var item = Menu.Find(path);
+        if (item is not null)
+        {
+            Tabs.Open(item.Path, item.Text, item.Icon);
+        }
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

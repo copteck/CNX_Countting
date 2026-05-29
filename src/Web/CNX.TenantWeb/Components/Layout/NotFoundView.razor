@@ -1,0 +1,23 @@
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div style="padding:24px;">
+    <div class="cnx-card" style="text-align:center;padding:64px 24px;">
+        <RadzenIcon Icon="report_problem" Style="font-size:56px;color:var(--cnx-warning);" />
+        <h3 style="margin:16px 0 8px;">Không tìm th?y trang</h3>
+        <p style="color:var(--cnx-text-secondary);max-width:480px;margin:0 auto;">
+            ???ng d?n <code class="cnx-code">@CurrentPath</code> không t?n t?i ho?c ?ã b? di chuy?n.
+            Vui lòng ki?m tra l?i ho?c quay v? trang chính.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">
+            <RadzenButton Icon="home" Text="V? trang chính" Click="@(() => Navigation.NavigateTo("/"))" />
+            <RadzenButton Icon="arrow_back" Text="Quay l?i" ButtonStyle="ButtonStyle.Light" Click="GoBack" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private string CurrentPath => "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+
+    private async Task GoBack() => await JS.InvokeVoidAsync("history.back");
+}

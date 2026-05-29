@@ -1,0 +1,294 @@
+{
+  "$schema": "https://copilot.visualstudio/agent-spec/v1",
+  "_note": "ĐÂY LÀ ĐẶC TẢ CỐT LÕI (SINGLE SOURCE OF TRUTH) CỦA DỰ ÁN CNX_COUNTING. Mọi AI/Copilot khi sinh code PHẢI bám theo file này, KHÔNG được tự ý đổi kiến trúc, đổi màu sắc, đổi tech stack hay bịa thêm module ngoài đặc tả. Khi có mâu thuẫn giữa yêu cầu nhất thời và file này, ưu tiên file này hoặc HỎI LẠI người dùng.",
+  "project": {
+    "name": "CNX_Counting",
+    "displayName": "Hệ thống Quản trị Kế toán Đa khách hàng (Multi-tenant Accounting Platform)",
+    "language": "vi",
+    "description": "Hệ thống SaaS quản trị số liệu kế toán cho công ty dịch vụ kế toán, phục vụ nhiều khách hàng (multi-tenant). Sinh code theo đặc tả này, dựa trên solution Clean Architecture .NET 8 đã có sẵn trong repository.",
+    "existingRepository": "copteck/CNX_Countting",
+    "instruction": "TÔN TRỌNG cấu trúc solution đang tồn tại. KHÔNG xóa code có sẵn. Mở rộng và hoàn thiện theo đặc tả. Mọi code phải build được, có XML doc comment tiếng Việt, tuân thủ SOLID."
+  },
+  "techStack": {
+    "framework": ".NET 8 (LTS)",
+    "language": "C# 12",
+    "orm": "Entity Framework Core 8",
+    "database": "SQL Server 2019+",
+    "architecture": "Clean Architecture (Domain / Application / Infrastructure / Presentation)",
+    "auth": "JWT ****** ASP.NET Core Identity, Refresh Token, RBAC theo Role + Claim",
+    "apiDocs": "Swagger / OpenAPI + Scalar UI",
+    "apiVersioning": "Asp.Versioning (v1, v2)",
+    "validation": "FluentValidation",
+    "mapping": "Mapster hoặc AutoMapper (full DTO mapping, không lộ Entity ra API)",
+    "logging": "Serilog (console + file + seq)",
+    "resilience": "Polly (retry + circuit breaker) cho external API",
+    "caching": "IMemoryCache + Redis (tùy chọn)",
+    "ui": "Radzen Blazor (Blazor Server hoặc WebAssembly)",
+    "ide": "Visual Studio 2022"
+  },
+  "designSystem": {
+    "theme": "Premium Dark — thuần tối, sang trọng, công nghệ cao. KHÔNG dùng cam. KHÔNG dùng màu sáng rực. Chỉ dùng accent xanh cyan nhẹ.",
+    "radzenTheme": "material-dark-base (BẮT BUỘC). KHÔNG dùng theme sáng, KHÔNG custom theme sáng.",
+    "primaryColors": {
+      "accent": "#22D3EE",
+      "accentDim": "#0891B2",
+      "bgDeep": "#0B0F19",
+      "bgCard": "#111827",
+      "bgSurface": "#1F2937",
+      "bgElevated": "#374151",
+      "border": "#1E293B",
+      "borderHover": "#334155"
+    },
+    "semanticColors": {
+      "success": "#10B981",
+      "warning": "#FBBF24",
+      "danger": "#EF4444",
+      "info": "#22D3EE",
+      "background": "#0B0F19",
+      "surface": "#111827",
+      "textPrimary": "#F1F5F9",
+      "textSecondary": "#94A3B8",
+      "textMuted": "#64748B"
+    },
+    "guidelines": [
+      "TUYỆT ĐỐI KHÔNG dùng màu cam, đỏ sáng, hay bất kỳ warm color nào làm chủ đạo.",
+      "Accent duy nhất: cyan #22D3EE (cho button primary, link active, icon highlight).",
+      "Nền chính: #0B0F19 (deep black-blue), card/panel: #111827, elevated: #1F2937.",
+      "Border: 1px solid #1E293B (rất mờ), hover border: #334155.",
+      "Text: #F1F5F9 (primary), #94A3B8 (secondary), #64748B (muted/placeholder).",
+      "KHÔNG gradient rực rỡ. Nếu dùng gradient: chỉ đen → xám đậm (subtle).",
+      "Bo góc: 8px (card), 6px (button/input), 12px (modal/dialog).",
+      "Bóng đổ: 0 4px 24px rgba(0,0,0,0.5) — tối và mềm.",
+      "Font: Inter (ưu tiên) hoặc system-ui. Line-height 1.6.",
+      "Khoảng cách: dùng hệ 4px/8px/16px/24px/32px."
+    ]
+  },
+  "solutionStructure": {
+    "CNX_Counting.sln": {
+      "src/Domain/CNX.Domain": "Entities, Enums, Value Objects, Domain Interfaces (đã có, mở rộng đầy đủ).",
+      "src/Application/CNX.Application": "Services, FULL DTOs (Request/Response/List/Detail cho mọi module), Interfaces, Validators, Mapping profiles, CQRS optional.",
+      "src/Infrastructure/CNX.Infrastructure": "EF Core, MasterDbContext + ApplicationDbContext per tenant, Repositories, UnitOfWork, MultiTenancy, Audit interceptor, External API client.",
+      "src/CNX.Shared": "Constants, Extensions, Helpers, Result/ApiResponse wrapper, Pagination.",
+      "src/Presentation/CNX.Admin.Api": "Admin Web API (port 5001) — quản trị tenant, auth, dashboard.",
+      "src/Presentation/CNX.Portal.Api": "Client Portal API (port 5002) — kế toán, kho, sản xuất, thuế theo subdomain.",
+      "src/Tools/CNX.CodeGen": "CÔNG CỤ CHUYÊN VIẾT TOOL — console/CLI scaffolding tool tự sinh Entity + DTO + Service + Controller + Validator + Radzen page từ template/định nghĩa JSON.",
+      "src/Web/CNX.StaffPortal": "WEB PORTAL CHO NHÂN VIÊN — Radzen Blazor app cho nhân viên công ty dịch vụ kế toán (quản lý nhiều khách hàng, nghiệp vụ nội bộ).",
+      "src/Web/CNX.TenantWeb": "WEB TENANT CHO KHÁCH HÀNG — Radzen Blazor app cho khách hàng truy cập theo subdomain, xem số liệu của riêng họ.",
+      "tests/": "Unit tests (xUnit) + Integration tests (WebApplicationFactory) cho Application & API."
+    }
+  },
+  "modules": [
+    {
+      "name": "Tenant & Auth",
+      "features": [
+        "CRUD khách hàng",
+        "Quản lý subdomain",
+        "Kích hoạt/Vô hiệu hóa",
+        "Đăng nhập JWT + Refresh token",
+        "Phân quyền Role/Claim",
+        "Dashboard tổng quan"
+      ],
+      "dtos": [
+        "TenantCreateDto",
+        "TenantUpdateDto",
+        "TenantListDto",
+        "TenantDetailDto",
+        "LoginRequestDto",
+        "LoginResponseDto",
+        "RefreshTokenDto",
+        "UserDto"
+      ]
+    },
+    {
+      "name": "Kế toán (Accounting)",
+      "features": [
+        "Chart of Accounts",
+        "Journal Entries (bút toán)",
+        "Hóa đơn đầu vào/đầu ra",
+        "Ghi sổ kế toán"
+      ],
+      "dtos": [
+        "AccountChartDto",
+        "JournalEntryDto",
+        "JournalEntryLineDto",
+        "InvoiceDto",
+        "InvoiceCreateDto"
+      ]
+    },
+    {
+      "name": "Báo cáo thuế (Tax)",
+      "features": [
+        "Kê khai GTGT/TNDN/TNCN/Nhà thầu",
+        "Workflow: Nháp → Chờ duyệt → Nộp → Duyệt"
+      ],
+      "dtos": [
+        "TaxReportDto",
+        "TaxReportCreateDto",
+        "TaxReportApprovalDto"
+      ]
+    },
+    {
+      "name": "Quản lý tồn kho (Inventory)",
+      "features": [
+        "Quản lý kho",
+        "Sản phẩm/Vật tư",
+        "Nhập/Xuất/Chuyển kho",
+        "Cảnh báo tồn kho thấp"
+      ],
+      "dtos": [
+        "WarehouseDto",
+        "InventoryItemDto",
+        "InventoryTransactionDto"
+      ]
+    },
+    {
+      "name": "Sản xuất (Production)",
+      "features": [
+        "Lệnh sản xuất",
+        "Định mức NVL (BOM)",
+        "Chi phí sản xuất",
+        "Theo dõi tiến độ"
+      ],
+      "dtos": [
+        "ProductionOrderDto",
+        "BillOfMaterialDto",
+        "ProductionCostDto"
+      ]
+    }
+  ],
+  "multiTenancy": {
+    "model": "Database-per-tenant: MasterDbContext (CNX_Master) cho auth/tenant registry; ApplicationDbContext riêng cho mỗi tenant DB.",
+    "resolution": "Phân giải tenant qua subdomain ({tenant}.cnxcounting.com) bằng middleware; áp EF Core Global Query Filter theo TenantId nơi áp dụng.",
+    "audit": "Audit logging tự động qua EF Core SaveChanges interceptor (Insert/Update/Delete → AuditLogs với old/new values)."
+  },
+  "codeGenTool": {
+    "project": "src/Tools/CNX.CodeGen",
+    "type": "Console CLI (System.CommandLine)",
+    "purpose": "Công cụ chuyên viết tool: đọc file định nghĩa JSON mô tả module → sinh tự động Entity, DTOs, Validator, Service interface + implementation, Repository registration, API Controller (Admin/Portal), và trang Radzen CRUD tương ứng.",
+    "commands": [
+      "cnxgen module --name Customer --fields \"Name:string,Code:string,Status:enum\"",
+      "cnxgen dto --entity Invoice",
+      "cnxgen page --module Inventory --type crud"
+    ],
+    "templating": "Dùng template (Scriban hoặc T4) với placeholder; output đúng vào thư mục layer tương ứng; tự cập nhật DI registration."
+  },
+  "apiStandards": {
+    "responseWrapper": "Mọi endpoint trả về ApiResponse<T> { success, data, message, errors, traceId }.",
+    "pagination": "PagedResult<T> { items, totalCount, page, pageSize, totalPages } cho mọi list endpoint.",
+    "errorHandling": "Global exception middleware → ProblemDetails (RFC 7807).",
+    "security": "JWT Bearer, rate limiting, CORS theo whitelist subdomain, HTTPS bắt buộc.",
+    "documentation": "Swagger + Scalar, mô tả tiếng Việt, ví dụ request/response cho mỗi endpoint."
+  },
+  "deliverables": [
+    "Solution build thành công không lỗi/cảnh báo (warning-as-error nơi hợp lý).",
+    "Full DTO + Mapping cho tất cả module, không expose Entity ra API.",
+    "CNX.CodeGen chạy được và sinh ra code mẫu hợp lệ.",
+    "CNX.StaffPortal (Radzen) chạy được với theme dark theme thuần tối + accent cyan, đăng nhập, dashboard, CRUD các module.",
+    "CNX.TenantWeb (Radzen) chạy được theo subdomain, hiển thị số liệu của tenant.",
+    "EF Core migrations cho Master + Tenant DB.",
+    "Unit/Integration tests cơ bản pass.",
+    "README cập nhật hướng dẫn chạy 3 ứng dụng web + 2 API + tool."
+  ],
+  "acceptanceCriteria": [
+    "dotnet build toàn solution thành công.",
+    "dotnet run cho từng project (2 API + 2 Web + tool) khởi động không lỗi.",
+    "Giao diện Radzen áp đúng bảng màu thương hiệu (dark thuần tối + accent cyan #22D3EE).",
+    "Mọi API endpoint trong README hoạt động và có trong Swagger.",
+    "Multi-tenancy phân giải đúng theo subdomain và lọc dữ liệu theo TenantId."
+  ],
+  "rulesForAI": [
+    "LUÔN đọc file này trước khi sinh hoặc sửa code.",
+    "KHÔNG đổi tech stack, kiến trúc, bảng màu hay cấu trúc solution nếu không được yêu cầu rõ ràng.",
+    "KHÔNG bịa thêm module/thư viện ngoài đặc tả; nếu thiếu thông tin thì HỎI LẠI thay vì tự suy diễn.",
+    "Giữ phong cách code nhất quán: Clean Architecture, full DTO, ApiResponse<T>, FluentValidation.",
+    "Mọi thay đổi phải build được và không phá vỡ code/test hiện có.",
+    "UI: PHẢI tuân theo 'uiTemplate' trong file này. KHÔNG tự sáng tạo style mới. KHÔNG dùng màu cam/warm color. Copy ĐÚNG pattern từ template."
+  ],
+  "uiTemplate": {
+    "_rule": "BẮT BUỘC tuân theo template dưới đây cho MỌI trang. KHÔNG sáng tạo thêm. KHÔNG đổi layout/màu/border-radius. AI phải copy đúng pattern này.",
+    "layout": {
+      "type": "RadzenLayout — fixed sidebar trái + header top + content area",
+      "sidebar": {
+        "width": "260px",
+        "background": "#111827",
+        "borderRight": "1px solid #1E293B",
+        "logo": "Trên cùng sidebar, text 'CNX' màu #22D3EE, font-bold 20px",
+        "menuStyle": "RadzenPanelMenu — icon + text, font 14px, padding 12px 16px, hover bg #1F2937, active item border-left 3px solid #22D3EE + bg #1F2937, text #F1F5F9",
+        "menuGroupStyle": "Text uppercase 11px #64748B, letter-spacing 1px, margin-top 16px"
+      },
+      "header": {
+        "height": "56px",
+        "background": "#111827",
+        "borderBottom": "1px solid #1E293B",
+        "content": "Breadcrumb bên trái + avatar/user dropdown bên phải"
+      },
+      "content": {
+        "background": "#0B0F19",
+        "padding": "24px",
+        "maxWidth": "none (full width)"
+      }
+    },
+    "card": {
+      "background": "#111827",
+      "border": "1px solid #1E293B",
+      "borderRadius": "8px",
+      "padding": "20px",
+      "boxShadow": "0 4px 24px rgba(0,0,0,0.4)",
+      "hoverEffect": "border-color chuyển #334155"
+    },
+    "formPopup": {
+      "_rule": "TẤT CẢ form popup (tạo mới, chỉnh sửa, xác nhận) PHẢI dùng template này.",
+      "component": "RadzenDialog",
+      "overlay": "rgba(0,0,0,0.7) — backdrop tối đục",
+      "dialogBackground": "#111827",
+      "dialogBorder": "1px solid #1E293B",
+      "dialogBorderRadius": "12px",
+      "dialogBoxShadow": "0 8px 48px rgba(0,0,0,0.6)",
+      "headerStyle": "padding 16px 24px, border-bottom 1px solid #1E293B, font 16px semibold #F1F5F9",
+      "bodyStyle": "padding 24px, gap giữa fields 16px",
+      "footerStyle": "padding 16px 24px, border-top 1px solid #1E293B, flex justify-end, gap 8px",
+      "inputStyle": "bg #0B0F19, border 1px solid #1E293B, border-radius 6px, text #F1F5F9, placeholder #64748B, focus border #22D3EE, height 40px, padding 8px 12px",
+      "labelStyle": "font 13px #94A3B8, margin-bottom 4px",
+      "buttonPrimary": "bg #22D3EE, text #0B0F19 (tối trên sáng), border-radius 6px, font 14px semibold, padding 8px 16px, hover bg #06B6D4",
+      "buttonSecondary": "bg transparent, border 1px solid #334155, text #94A3B8, hover bg #1F2937",
+      "buttonDanger": "bg #EF4444, text white, hover bg #DC2626"
+    },
+    "dataTable": {
+      "component": "RadzenDataGrid",
+      "headerBg": "#1F2937",
+      "headerText": "#94A3B8 uppercase 11px",
+      "rowBg": "#111827",
+      "rowAltBg": "#0B0F19",
+      "rowHoverBg": "#1F2937",
+      "rowBorder": "1px solid #1E293B",
+      "cellPadding": "12px 16px",
+      "pagerStyle": "bg #111827, border-top 1px solid #1E293B"
+    },
+    "button": {
+      "primary": "bg #22D3EE, text #0B0F19, border-radius 6px",
+      "secondary": "bg transparent, border 1px solid #334155, text #94A3B8",
+      "ghost": "bg transparent, text #22D3EE, no border",
+      "danger": "bg #EF4444, text white",
+      "size": "height 36px, padding 8px 16px, font 14px"
+    },
+    "notification": {
+      "position": "top-right",
+      "background": "#1F2937",
+      "border": "1px solid #1E293B",
+      "borderRadius": "8px"
+    },
+    "chart": {
+      "background": "transparent",
+      "gridColor": "#1E293B",
+      "seriesColors": [
+        "#22D3EE",
+        "#10B981",
+        "#FBBF24",
+        "#A78BFA",
+        "#F472B6"
+      ],
+      "tooltipBg": "#1F2937",
+      "tooltipBorder": "#334155"
+    }
+  }
+}

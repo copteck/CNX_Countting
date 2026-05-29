@@ -1,0 +1,102 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CnxAuthStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject MenuService Menu
+@inject TabService Tabs
+
+<RadzenComponents />
+
+<AuthorizeView>
+    <Authorized>
+        <div class="cnx-shell">
+            <aside class="cnx-sidebar @(_collapsed ? "collapsed" : string.Empty)">
+                <NavMenu Collapsed="_collapsed" />
+            </aside>
+
+            <div class="cnx-main">
+                <header class="cnx-header">
+                    <div class="cnx-header-left">
+                        <RadzenButton Icon="menu" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light"
+                                      class="cnx-icon-btn" Click="@(() => _collapsed = !_collapsed)" />
+                        <span class="cnx-breadcrumb">@CurrentTitle</span>
+                    </div>
+                    <div class="cnx-header-right">
+                        <RadzenButton Icon="notifications" Variant="Variant.Text" ButtonStyle="ButtonStyle.Light"
+                                      class="cnx-icon-btn" />
+                        <div class="cnx-user">
+                            <div class="cnx-avatar">@(context.User.Identity?.Name?.Substring(0, 1).ToUpper())</div>
+                            <div class="cnx-user-info">
+                                <span class="cnx-user-name">@context.User.Identity?.Name</span>
+                                <span class="cnx-user-role">Quản trị viên</span>
+                            </div>
+                        </div>
+                        <RadzenButton Icon="logout" Text="Đăng xuất" Variant="Variant.Text"
+                                      ButtonStyle="ButtonStyle.Light" class="cnx-logout-btn" Click="Logout" />
+                    </div>
+                </header>
+
+                <TabBar />
+
+                <main class="cnx-content">
+                    <CnxErrorBoundary @ref="_errorBoundary">
+                        @Body
+                    </CnxErrorBoundary>
+                </main>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToLogin />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool _collapsed;
+    private CnxErrorBoundary? _errorBoundary;
+
+    private string CurrentTitle => "Trung tâm điều hành CNX";
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        SyncTab();
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        // Xóa trạng thái lỗi cũ khi chuyển trang để không chặn trang mới.
+        _errorBoundary?.RecoverFromError();
+        SyncTab();
+    }
+
+    /// <summary>Mở/kích hoạt tab tương ứng với menu đang điều hướng tới.</summary>
+    private void SyncTab()
+    {
+        var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).TrimEnd('/');
+        if (path == "/login")
+        {
+            return;
+        }
+
+        foreach (var group in Menu.Groups)
+        {
+            var item = group.Items.FirstOrDefault(i => i.Path == path);
+            if (item is not null)
+            {
+                Tabs.Open(item.Path, item.Text, item.Icon);
+                return;
+            }
+        }
+    }
+
+    private async Task Logout()
+    {
+        Tabs.CloseAll();
+        await AuthProvider.LogoutAsync();
+        Navigation.NavigateTo("/login", forceLoad: true);
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}
