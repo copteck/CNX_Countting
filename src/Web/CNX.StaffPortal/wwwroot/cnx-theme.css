@@ -1,50 +1,329 @@
-/* CNX_Counting - Brand theme: cam đậm + xanh đen + xanh công nghệ.
-   Đồng bộ với docs/cnx-agent-spec.json (designSystem). */
+/* CNX_Counting — Premium Dark Theme.
+   BẮT BUỘC tuân theo docs/cnx-agent-spec.json (designSystem + uiTemplate).
+   KHÔNG thêm cam/warm color. KHÔNG override style ngoài file này. */
+
+/* ═══════════ COLOR TOKENS ═══════════ */
 :root {
-    --cnx-orange-deep: #E8590C;
-    --cnx-orange-accent: #FF6B1A;
-    --cnx-navy-dark: #0A1929;
-    --cnx-navy-mid: #102A43;
-    --cnx-tech-blue: #0EA5E9;
-    --cnx-tech-cyan: #06B6D4;
-    --cnx-text-primary: #F8FAFC;
+    --cnx-accent: #22D3EE;
+    --cnx-accent-dim: #0891B2;
+    --cnx-bg-deep: #0B0F19;
+    --cnx-bg-card: #111827;
+    --cnx-bg-surface: #1F2937;
+    --cnx-bg-elevated: #374151;
+    --cnx-border: #1E293B;
+    --cnx-border-hover: #334155;
+    --cnx-text-primary: #F1F5F9;
     --cnx-text-secondary: #94A3B8;
+    --cnx-text-muted: #64748B;
+    --cnx-success: #10B981;
+    --cnx-warning: #FBBF24;
+    --cnx-danger: #EF4444;
+    --cnx-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --cnx-shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
 
-    /* Map sang biến của Radzen */
-    --rz-primary: var(--cnx-orange-deep);
-    --rz-primary-light: var(--cnx-orange-accent);
-    --rz-secondary: var(--cnx-tech-blue);
-    --rz-info: var(--cnx-tech-blue);
-    --rz-base-background-color: var(--cnx-navy-dark);
-    --rz-body-background-color: var(--cnx-navy-dark);
+    /* Radzen variable overrides */
+    --rz-primary: var(--cnx-accent);
+    --rz-primary-light: var(--cnx-accent-dim);
+    --rz-secondary: var(--cnx-bg-surface);
+    --rz-info: var(--cnx-accent);
+    --rz-success: var(--cnx-success);
+    --rz-warning: var(--cnx-warning);
+    --rz-danger: var(--cnx-danger);
+    --rz-base-background-color: var(--cnx-bg-deep);
+    --rz-body-background-color: var(--cnx-bg-deep);
     --rz-text-color: var(--cnx-text-primary);
+    --rz-text-secondary-color: var(--cnx-text-secondary);
+    --rz-input-background-color: var(--cnx-bg-deep);
+    --rz-input-border: 1px solid var(--cnx-border);
+    --rz-input-focus-border: 1px solid var(--cnx-accent);
+    --rz-dialog-background-color: var(--cnx-bg-card);
 }
 
-body {
-    background-color: var(--cnx-navy-dark);
+/* ═══════════ BASE ═══════════ */
+html, body {
+    background-color: var(--cnx-bg-deep);
     color: var(--cnx-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    margin: 0;
 }
 
-/* Header gradient cam -> xanh công nghệ */
+/* ═══════════ SIDEBAR ═══════════ */
+.cnx-sidebar,
+.rz-sidebar {
+    width: 260px;
+    background-color: var(--cnx-bg-card);
+    border-right: 1px solid var(--cnx-border);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    overflow-y: auto;
+}
+
+.cnx-sidebar-logo {
+    padding: 20px 24px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cnx-accent);
+    border-bottom: 1px solid var(--cnx-border);
+}
+
+/* Menu items */
+.rz-panel-menu .rz-navigation-item-text,
+.cnx-menu-item {
+    font-size: 14px;
+    padding: 12px 16px;
+    color: var(--cnx-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease;
+}
+
+.rz-panel-menu .rz-navigation-item-text:hover,
+.cnx-menu-item:hover {
+    background-color: var(--cnx-bg-surface);
+}
+
+.rz-panel-menu .rz-state-active .rz-navigation-item-text,
+.cnx-menu-item.active {
+    border-left-color: var(--cnx-accent);
+    background-color: var(--cnx-bg-surface);
+    color: var(--cnx-accent);
+}
+
+.cnx-menu-group {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--cnx-text-muted);
+    padding: 16px 16px 6px;
+}
+
+/* ═══════════ HEADER ═══════════ */
 .cnx-header {
-    background: linear-gradient(90deg, var(--cnx-orange-deep) 0%, var(--cnx-tech-blue) 100%);
-    color: #fff;
+    height: 56px;
+    background-color: var(--cnx-bg-card);
+    border-bottom: 1px solid var(--cnx-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
-/* Sidebar tối */
-.cnx-sidebar {
-    background-color: var(--cnx-navy-mid);
+/* ═══════════ CONTENT ═══════════ */
+.cnx-content {
+    margin-left: 260px;
+    padding: 24px;
+    min-height: 100vh;
+    background-color: var(--cnx-bg-deep);
+}
+
+/* ═══════════ CARD ═══════════ */
+.cnx-card,
+.rz-card {
+    background-color: var(--cnx-bg-card);
+    border: 1px solid var(--cnx-border);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--cnx-shadow);
+    transition: border-color 0.2s ease;
+}
+
+.cnx-card:hover,
+.rz-card:hover {
+    border-color: var(--cnx-border-hover);
+}
+
+/* ═══════════ FORM / DIALOG (POPUP) ═══════════ */
+.rz-dialog-wrapper {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.rz-dialog {
+    background-color: var(--cnx-bg-card) !important;
+    border: 1px solid var(--cnx-border) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--cnx-shadow-lg) !important;
+    overflow: hidden;
+}
+
+.rz-dialog-titlebar {
+    padding: 16px 24px !important;
+    border-bottom: 1px solid var(--cnx-border) !important;
+    background: transparent !important;
+}
+
+.rz-dialog-titlebar .rz-dialog-title {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: var(--cnx-text-primary) !important;
+}
+
+.rz-dialog-content {
+    padding: 24px !important;
+}
+
+.rz-dialog-footer,
+.cnx-dialog-footer {
+    padding: 16px 24px !important;
+    border-top: 1px solid var(--cnx-border) !important;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ═══════════ FORM INPUTS ═══════════ */
+.rz-textbox,
+.rz-inputtext,
+.rz-dropdown,
+.rz-calendar-input,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea,
+select {
+    background-color: var(--cnx-bg-deep) !important;
+    border: 1px solid var(--cnx-border) !important;
+    border-radius: 6px !important;
+    color: var(--cnx-text-primary) !important;
+    height: 40px;
+    padding: 8px 12px !important;
+    font-size: 14px;
+    transition: border-color 0.15s ease;
+}
+
+.rz-textbox:focus,
+.rz-inputtext:focus,
+input:focus,
+textarea:focus {
+    border-color: var(--cnx-accent) !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
+}
+
+.rz-textbox::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--cnx-text-muted) !important;
+}
+
+label,
+.rz-form-field-label {
+    font-size: 13px !important;
+    color: var(--cnx-text-secondary) !important;
+    margin-bottom: 4px !important;
+}
+
+/* ═══════════ BUTTONS ═══════════ */
+.rz-button {
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    font-weight: 600;
+    padding: 8px 16px !important;
+    height: 36px;
+    transition: all 0.15s ease;
+}
+
+.rz-button-primary,
+.cnx-btn-primary {
+    background-color: var(--cnx-accent) !important;
+    color: var(--cnx-bg-deep) !important;
+    border: none !important;
+}
+
+.rz-button-primary:hover {
+    background-color: var(--cnx-accent-dim) !important;
+}
+
+.rz-button-secondary,
+.cnx-btn-secondary {
+    background-color: transparent !important;
+    border: 1px solid var(--cnx-border-hover) !important;
+    color: var(--cnx-text-secondary) !important;
+}
+
+.rz-button-secondary:hover {
+    background-color: var(--cnx-bg-surface) !important;
+}
+
+.rz-button-danger,
+.cnx-btn-danger {
+    background-color: var(--cnx-danger) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* ═══════════ DATA TABLE ═══════════ */
+.rz-datatable,
+.rz-grid {
+    border: 1px solid var(--cnx-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rz-datatable-thead th,
+.rz-grid-header {
+    background-color: var(--cnx-bg-surface) !important;
+    color: var(--cnx-text-secondary) !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid var(--cnx-border) !important;
+}
+
+.rz-datatable-tbody tr {
+    background-color: var(--cnx-bg-card);
+    border-bottom: 1px solid var(--cnx-border);
+}
+
+.rz-datatable-tbody tr:nth-child(even) {
+    background-color: var(--cnx-bg-deep);
+}
+
+.rz-datatable-tbody tr:hover {
+    background-color: var(--cnx-bg-surface) !important;
+}
+
+.rz-datatable-tbody td {
+    padding: 12px 16px !important;
     color: var(--cnx-text-primary);
 }
 
-/* Card viền sáng nhẹ */
-.cnx-card {
-    background-color: var(--cnx-navy-mid);
-    border: 1px solid rgba(14, 165, 233, 0.25);
-    border-radius: 12px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+.rz-pager {
+    background-color: var(--cnx-bg-card) !important;
+    border-top: 1px solid var(--cnx-border) !important;
 }
 
-.rz-button-primary {
-    background-color: var(--cnx-orange-deep) !important;
+/* ═══════════ NOTIFICATION ═══════════ */
+.rz-notification {
+    background-color: var(--cnx-bg-surface) !important;
+    border: 1px solid var(--cnx-border) !important;
+    border-radius: 8px !important;
 }
+
+/* ═══════════ SCROLLBAR ═══════════ */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cnx-bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cnx-border-hover);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cnx-text-muted);
+}
+
