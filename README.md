@@ -78,11 +78,31 @@ CNX_Counting.sln
 │   ├── Application/CNX.Application/    # Services, DTOs, Business Logic
 │   ├── Infrastructure/CNX.Infrastructure/ # EF Core, Repositories, Multi-tenancy
 │   ├── CNX.Shared/                     # Constants, Extensions, Helpers
-│   └── Presentation/
-│       ├── CNX.Admin.Api/              # Admin Web API (quản trị tổng thể)
-│       └── CNX.Portal.Api/            # Client Portal API (subdomain)
+│   ├── Presentation/
+│   │   ├── CNX.Admin.Api/             # Admin Web API (quản trị tổng thể)
+│   │   └── CNX.Portal.Api/            # Client Portal API (subdomain)
+│   ├── Tools/
+│   │   └── CNX.CodeGen/               # Công cụ chuyên viết tool (scaffolding CLI)
+│   └── Web/
+│       ├── CNX.StaffPortal/           # Web portal cho nhân viên (Radzen Blazor)
+│       └── CNX.TenantWeb/             # Web cho khách hàng/tenant (Radzen Blazor)
 └── tests/
 ```
+
+### Chạy các ứng dụng Web & công cụ
+
+```bash
+# Web nhân viên (Radzen Blazor)
+dotnet run --project src/Web/CNX.StaffPortal
+
+# Web khách hàng (Radzen Blazor)
+dotnet run --project src/Web/CNX.TenantWeb
+
+# Công cụ sinh code (ví dụ: sinh DTO)
+dotnet run --project src/Tools/CNX.CodeGen -- dto --name Customer --fields "Name:string,Code:string,IsActive:bool"
+```
+
+> Giao diện 2 web dùng **Radzen Blazor** với theme thương hiệu `wwwroot/cnx-theme.css` (cam đậm `#E8590C` + xanh đen `#0A1929` + xanh công nghệ `#0EA5E9`).
 
 ## Phân hệ chính
 
@@ -169,4 +189,17 @@ dotnet run --project src/Presentation/CNX.Portal.Api
 ## License
 
 Private - CNX Counting © 2024
+
+## 💰 Mẹo tối ưu token mỗi lần gọi AI
+
+Để AI làm đúng mà tốn ít token nhất:
+
+1. **Ra lệnh ngắn, trỏ tới file đặc tả** thay vì mô tả lại từ đầu:
+   > "Theo `docs/cnx-agent-spec.json`, làm module Inventory." — đặc tả dài đã nằm trong file, không cần lặp lại trong chat.
+2. **Làm từng module/việc nhỏ một**, đừng yêu cầu "code hết tất cả" trong 1 lần — vừa tốn token vừa dễ sai, khó kiểm soát.
+3. **Chỉ rõ phạm vi file/thư mục** cần sửa (ví dụ "chỉ sửa trong `src/Web/CNX.StaffPortal`") để AI không đọc cả repo.
+4. **Mở session mới cho việc mới.** Chat càng dài, mỗi lần gọi càng phải "nhớ" lại toàn bộ lịch sử ⇒ tốn token. Việc cốt lõi đã lưu ở file nên không sợ mất.
+5. **Sửa yêu cầu nền tảng trong file**, không tranh luận trong chat: đổi màu/module/kiến trúc thì sửa `docs/cnx-agent-spec.json` rồi bảo AI "đọc lại spec".
+6. **Tận dụng công cụ `CNX.CodeGen`** để sinh code lặp đi lặp lại (DTO, CRUD) bằng máy — gần như tốn 0 token AI.
+7. **Dùng `.github/copilot-instructions.md`** (đã có sẵn): Copilot tự đọc nên bạn không phải nhắc lại quy tắc mỗi lần.
 
