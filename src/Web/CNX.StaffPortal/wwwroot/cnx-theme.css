@@ -1,0 +1,50 @@
+/* CNX_Counting - Brand theme: cam đậm + xanh đen + xanh công nghệ.
+   Đồng bộ với docs/cnx-agent-spec.json (designSystem). */
+:root {
+    --cnx-orange-deep: #E8590C;
+    --cnx-orange-accent: #FF6B1A;
+    --cnx-navy-dark: #0A1929;
+    --cnx-navy-mid: #102A43;
+    --cnx-tech-blue: #0EA5E9;
+    --cnx-tech-cyan: #06B6D4;
+    --cnx-text-primary: #F8FAFC;
+    --cnx-text-secondary: #94A3B8;
+
+    /* Map sang biến của Radzen */
+    --rz-primary: var(--cnx-orange-deep);
+    --rz-primary-light: var(--cnx-orange-accent);
+    --rz-secondary: var(--cnx-tech-blue);
+    --rz-info: var(--cnx-tech-blue);
+    --rz-base-background-color: var(--cnx-navy-dark);
+    --rz-body-background-color: var(--cnx-navy-dark);
+    --rz-text-color: var(--cnx-text-primary);
+}
+
+body {
+    background-color: var(--cnx-navy-dark);
+    color: var(--cnx-text-primary);
+}
+
+/* Header gradient cam -> xanh công nghệ */
+.cnx-header {
+    background: linear-gradient(90deg, var(--cnx-orange-deep) 0%, var(--cnx-tech-blue) 100%);
+    color: #fff;
+}
+
+/* Sidebar tối */
+.cnx-sidebar {
+    background-color: var(--cnx-navy-mid);
+    color: var(--cnx-text-primary);
+}
+
+/* Card viền sáng nhẹ */
+.cnx-card {
+    background-color: var(--cnx-navy-mid);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.rz-button-primary {
+    background-color: var(--cnx-orange-deep) !important;
+}
