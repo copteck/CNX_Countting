@@ -1,0 +1,107 @@
+﻿@page "/"
+
+<PageTitle>Bảng điều khiển · CNX Super Tool</PageTitle>
+
+<div class="cnx-page">
+    <div class="cnx-page-head">
+        <div>
+            <h1 class="cnx-page-title">Bảng điều khiển</h1>
+            <p class="cnx-page-sub">Tổng quan toàn hệ thống quản trị CNX</p>
+        </div>
+        <RadzenButton Icon="add" Text="Tạo nhanh" class="cnx-btn-primary" />
+    </div>
+
+    <div class="cnx-stat-grid">
+        @foreach (var s in _stats)
+        {
+            <div class="cnx-stat-card">
+                <div class="cnx-stat-icon" style="background:@(s.Color)22; color:@s.Color">
+                    <span class="material-icons">@s.Icon</span>
+                </div>
+                <div class="cnx-stat-body">
+                    <span class="cnx-stat-value">@s.Value</span>
+                    <span class="cnx-stat-label">@s.Label</span>
+                </div>
+                <span class="cnx-stat-delta @(s.Up ? "up" : "down")">
+                    <span class="material-icons">@(s.Up ? "trending_up" : "trending_down")</span>@s.Delta
+                </span>
+            </div>
+        }
+    </div>
+
+    <div class="cnx-grid-2">
+        <div class="cnx-card">
+            <div class="cnx-card-head">
+                <h3>Doanh thu theo tháng</h3>
+                <span class="cnx-card-tag">2026</span>
+            </div>
+            <RadzenChart>
+                <RadzenColumnSeries Data="@_revenue" CategoryProperty="Month" ValueProperty="Value" Title="Doanh thu" />
+                <RadzenColumnOptions Radius="4" />
+                <RadzenValueAxis>
+                    <RadzenGridLines Visible="true" />
+                </RadzenValueAxis>
+            </RadzenChart>
+        </div>
+
+        <div class="cnx-card">
+            <div class="cnx-card-head">
+                <h3>Phân bổ phân hệ</h3>
+            </div>
+            <RadzenChart>
+                <RadzenDonutSeries Data="@_modules" CategoryProperty="Name" ValueProperty="Value" />
+            </RadzenChart>
+        </div>
+    </div>
+
+    <div class="cnx-card">
+        <div class="cnx-card-head">
+            <h3>Hoạt động gần đây</h3>
+        </div>
+        <RadzenDataGrid Data="@_activities" TItem="ActivityItem" AllowPaging="true" PageSize="5" class="cnx-grid">
+            <Columns>
+                <RadzenDataGridColumn TItem="ActivityItem" Property="Time" Title="Thời gian" Width="160px" />
+                <RadzenDataGridColumn TItem="ActivityItem" Property="Module" Title="Phân hệ" Width="180px" />
+                <RadzenDataGridColumn TItem="ActivityItem" Property="Description" Title="Mô tả" />
+                <RadzenDataGridColumn TItem="ActivityItem" Property="User" Title="Người dùng" Width="140px" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>
+
+@code {
+    private record Stat(string Label, string Value, string Icon, string Color, string Delta, bool Up);
+    private record RevenuePoint(string Month, double Value);
+    private record ModuleShare(string Name, double Value);
+    private record ActivityItem(string Time, string Module, string Description, string User);
+
+    private readonly List<Stat> _stats = new()
+    {
+        new("Khách hàng (Tenant)", "128", "groups", "#22D3EE", "+12%", true),
+        new("Hóa đơn điện tử", "4.382", "receipt_long", "#10B981", "+8%", true),
+        new("Đơn POS hôm nay", "967", "point_of_sale", "#FBBF24", "+23%", true),
+        new("Cảnh báo hệ thống", "5", "warning", "#EF4444", "-2", false),
+    };
+
+    private readonly List<RevenuePoint> _revenue = new()
+    {
+        new("T1", 320), new("T2", 410), new("T3", 380), new("T4", 520),
+        new("T5", 610), new("T6", 580), new("T7", 720), new("T8", 690),
+    };
+
+    private readonly List<ModuleShare> _modules = new()
+    {
+        new("Hóa đơn ĐT", 35), new("TMĐT", 25), new("POS", 20),
+        new("Kế toán", 12), new("Khác", 8),
+    };
+
+    private readonly List<ActivityItem> _activities = new()
+    {
+        new("09:42 hôm nay", "Hóa đơn điện tử", "Phát hành 24 hóa đơn đầu ra", "admin"),
+        new("09:15 hôm nay", "POS", "Chốt ca làm việc quầy số 3", "admin"),
+        new("08:50 hôm nay", "Quản trị SQL", "Sao lưu CSDL CNX_Master thành công", "admin"),
+        new("08:30 hôm nay", "TMĐT", "Đồng bộ 56 đơn hàng từ sàn", "admin"),
+        new("Hôm qua", "Báo cáo thuế", "Nộp tờ khai GTGT tháng", "admin"),
+        new("Hôm qua", "Hệ thống", "Thêm tenant mới: Công ty ABC", "admin"),
+    };
+}

@@ -1,10 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <!-- Lo?i tr? d? án con CNX.ToolWeb kh?i quá trình biên d?ch c?a d? án cha -->
+  <ItemGroup>
+    <Compile Remove="CNX.ToolWeb\**" />
+    <Content Remove="CNX.ToolWeb\**" />
+    <EmbeddedResource Remove="CNX.ToolWeb\**" />
+    <None Remove="CNX.ToolWeb\**" />
+    <Compile Remove="..\CNX.ToolWeb\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Radzen.Blazor" Version="10.4.6" />

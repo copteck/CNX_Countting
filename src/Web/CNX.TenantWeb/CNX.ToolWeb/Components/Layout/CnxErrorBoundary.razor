@@ -1,0 +1,39 @@
+@inherits ErrorBoundary
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    @* V?n hi?n th? n?i dung bên d??i ?? tránh treo trang *@
+    @ChildContent
+
+    <div class="cnx-error-overlay">
+        <div class="cnx-error-popup">
+            <div class="cnx-error-popup-head">
+                <span class="material-icons cnx-error-popup-icon">error_outline</span>
+                <span>?ã x?y ra s? c?</span>
+            </div>
+            <div class="cnx-error-popup-body">
+                <p>H? th?ng g?p l?i không mong mu?n nh?ng ?ã ???c ch?n l?i ?? tránh treo ?ng d?ng.</p>
+                <p class="cnx-error-popup-detail">@CurrentException?.Message</p>
+            </div>
+            <div class="cnx-error-popup-foot">
+                <RadzenButton Text="B? qua" Variant="Variant.Outlined" Click="Dismiss" />
+                <RadzenButton Text="Th? l?i" Icon="refresh" class="cnx-btn-primary" Click="Retry" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>?óng popup và xóa tr?ng thái l?i.</summary>
+    private void Dismiss() => Recover();
+
+    /// <summary>Khôi ph?c và render l?i n?i dung.</summary>
+    private void Retry() => Recover();
+
+    /// <summary>Khôi ph?c t? bên ngoài (vd: khi chuy?n trang).</summary>
+    public void RecoverFromError() => Recover();
+}

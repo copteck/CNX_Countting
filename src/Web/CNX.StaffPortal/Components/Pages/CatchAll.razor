@@ -1,0 +1,9 @@
+@page "/{*path:nonfile}"
+
+<NotFoundView />
+
+@code {
+    /// <summary>???ng d?n không kh?p route nào — b?t tr?n ?? hi?n th? trang c?nh báo.</summary>
+    [Parameter]
+    public string? Path { get; set; }
+}

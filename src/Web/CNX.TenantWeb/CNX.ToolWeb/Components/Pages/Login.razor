@@ -1,0 +1,91 @@
+﻿@page "/login"
+@layout BlankLayout
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CnxAuthStateProvider AuthProvider
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Đăng nhập · CNX Super Tool</PageTitle>
+
+<div class="cnx-login-bg">
+    <div class="cnx-login-glow cnx-glow-1"></div>
+    <div class="cnx-login-glow cnx-glow-2"></div>
+
+    <div class="cnx-login-card">
+        <div class="cnx-login-brand">
+            <div class="cnx-login-logo">CNX</div>
+            <div class="cnx-login-title">Super Tool</div>
+            <div class="cnx-login-subtitle">Trung tâm điều hành quản trị</div>
+        </div>
+
+        <EditForm Model="@_model" OnValidSubmit="HandleLogin" class="cnx-login-form">
+            <DataAnnotationsValidator />
+
+            <div class="cnx-field">
+                <label class="cnx-label">Tên đăng nhập</label>
+                <RadzenTextBox @bind-Value="_model.UserName" Placeholder="Nhập tên đăng nhập"
+                               class="cnx-input" autocomplete="username" />
+            </div>
+
+            <div class="cnx-field">
+                <label class="cnx-label">Mật khẩu</label>
+                <RadzenPassword @bind-Value="_model.Password" Placeholder="Nhập mật khẩu"
+                                class="cnx-input" autocomplete="current-password" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <div class="cnx-login-error">
+                    <span class="material-icons">error_outline</span> @_error
+                </div>
+            }
+
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@(_busy ? "Đang đăng nhập..." : "Đăng nhập")"
+                          Disabled="_busy" class="cnx-login-btn" />
+        </EditForm>
+
+        <div class="cnx-login-foot">© @DateTime.Now.Year CNX Counting · Multi-tenant Platform</div>
+    </div>
+</div>
+
+@code {
+    private readonly LoginModel _model = new();
+    private string? _error;
+    private bool _busy;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Nếu đã đăng nhập thì chuyển thẳng vào trang chính.
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (state.User.Identity?.IsAuthenticated == true)
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        _busy = true;
+        _error = null;
+
+        var ok = await AuthProvider.LoginAsync(_model.UserName, _model.Password);
+        if (ok)
+        {
+            var target = string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : Uri.UnescapeDataString(ReturnUrl);
+            Navigation.NavigateTo(target, forceLoad: true);
+            return;
+        }
+
+        _error = "Tên đăng nhập hoặc mật khẩu không đúng.";
+        _busy = false;
+    }
+
+    private sealed class LoginModel
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

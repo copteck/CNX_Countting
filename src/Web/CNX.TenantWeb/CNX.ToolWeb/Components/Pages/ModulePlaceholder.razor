@@ -1,0 +1,89 @@
+@page "/operations"
+@page "/einvoice/outgoing"
+@page "/einvoice/incoming"
+@page "/einvoice/issue"
+@page "/einvoice/lookup"
+@page "/ecommerce/shops"
+@page "/ecommerce/orders"
+@page "/ecommerce/sync"
+@page "/ecommerce/promotions"
+@page "/pos/sales"
+@page "/pos/shifts"
+@page "/pos/terminals"
+@page "/pos/reports"
+@page "/sql/query"
+@page "/sql/databases"
+@page "/sql/backup"
+@page "/sql/monitor"
+@page "/accounting/chart"
+@page "/accounting/journal"
+@page "/accounting/ledger"
+@page "/accounting/reports"
+@page "/inventory/warehouses"
+@page "/inventory/items"
+@page "/production/orders"
+@page "/production/bom"
+@page "/tax/vat"
+@page "/tax/income"
+@page "/tax/approval"
+@page "/admin/tenants"
+@page "/admin/users"
+@page "/admin/audit"
+@page "/admin/settings"
+@inject MenuService Menu
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>@_title · CNX Super Tool</PageTitle>
+
+<div class="cnx-page">
+    <div class="cnx-page-head">
+        <div>
+            <h1 class="cnx-page-title">@_title</h1>
+            <p class="cnx-page-sub">@_group</p>
+        </div>
+        <RadzenButton Icon="add" Text="Thêm m?i" class="cnx-btn-primary" />
+    </div>
+
+    <div class="cnx-card cnx-empty">
+        <span class="material-icons cnx-empty-icon">@_icon</span>
+        <h3>Phân h? "@_title" ?ã s?n sàng</h3>
+        <p>Module này ?ang ???c k?t n?i vào trung tâm ?i?u hành CNX Super Tool. N?i dung nghi?p v? s? ???c b? sung theo ??c t?.</p>
+    </div>
+</div>
+
+@code {
+    private string _title = "Phân h?";
+    private string _group = string.Empty;
+    private string _icon = "widgets";
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        Resolve();
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        Resolve();
+        StateHasChanged();
+    }
+
+    private void Resolve()
+    {
+        var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).TrimEnd('/');
+        foreach (var g in Menu.Groups)
+        {
+            var match = g.Items.FirstOrDefault(i => i.Path == path);
+            if (match is not null)
+            {
+                _title = match.Text;
+                _group = g.Title;
+                _icon = match.Icon;
+                return;
+            }
+        }
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

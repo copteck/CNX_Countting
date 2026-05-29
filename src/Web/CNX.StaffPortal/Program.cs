@@ -1,4 +1,4 @@
-using Radzen;
+﻿using Radzen;
 using CNX.StaffPortal.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +9,10 @@ builder.Services.AddRazorComponents()
 
 // Radzen UI services (Dialog, Notification, Tooltip, ContextMenu)
 builder.Services.AddRadzenComponents();
+
+// Dịch vụ menu & tab control.
+builder.Services.AddSingleton<CNX.StaffPortal.Services.MenuService>();
+builder.Services.AddScoped<CNX.StaffPortal.Services.TabService>();
 
 var app = builder.Build();
 
